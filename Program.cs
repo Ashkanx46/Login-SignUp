@@ -4,30 +4,18 @@ using login.Services;
 using login.Data;
 using Microsoft.EntityFrameworkCore;
 
-
-
-
-
 class Program
 {
-
-
-    
     static void Main()
     {
-
         var options = new DbContextOptionsBuilder<AppDbContext>()
-        .UseSqlite("Data Source=users.db")
-        .Options;
+            .UseSqlite("Data Source=users.db")
+            .Options;
 
         var db = new AppDbContext(options);
         db.Database.EnsureCreated(); // اگه دیتابیس وجود نداشت، بسازش
 
-
-
         var repo = new UserRepository(db);
-        
-
         var auth = new AuthService(repo);
 
         User currentUser = null;
@@ -61,11 +49,9 @@ class Program
             else
             {
                 Console.WriteLine("1. Show Users");
-                Console.WriteLine("2. Change Password");
+                Console.WriteLine("2. Account Manager");
                 Console.WriteLine("3. Logout");
-                Console.WriteLine("4. Delete Account"); // 👈 اضافه شد
-                Console.WriteLine("5. Exit");
-
+                Console.WriteLine("4. Exit");
             }
 
             Console.WriteLine("=================================");
@@ -154,51 +140,66 @@ class Program
                         }
                     }
                 }
-                else if (choice == "2") // Change Password
+                else if (choice == "2") // Account Manager
+                {
+                    Console.WriteLine("=== Account Manager ===");
+                    Console.WriteLine("1. Change Password");
+                    Console.WriteLine("2. Delete Account");
+                    Console.WriteLine("3. Back");
+
+                    Console.Write("Choose an option: ");
+                    string accChoice = Console.ReadLine();
+
+                    if (accChoice == "1") // Change Password
+                    {
+                        Console.Write("Enter new password: ");
+                        string? newPassword = Console.ReadLine();
+
+                        if (string.IsNullOrWhiteSpace(newPassword))
                         {
-                           Console.Write("Enter new password: ");
-string? newPassword = Console.ReadLine();
-
-if (string.IsNullOrWhiteSpace(newPassword))
-{
-    Console.WriteLine("Password cannot be empty!");
-    continue;
-}
-
-                            if (auth.ChangePassword(currentUser.Username, newPassword!))
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Password changed successfully.");
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("Error changing password.");
-                            }
+                            Console.WriteLine("Password cannot be empty!");
                         }
-
-                        else if (choice == "3") // Logout
+                        else if (auth.ChangePassword(currentUser.Username, newPassword!))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Password changed successfully.");
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Error changing password.");
+                        }
+                    }
+                    else if (accChoice == "2") // Delete Account
+                    {
+                        if (repo.DeleteUser(currentUser.Username))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Your account has been deleted successfully.");
+                            currentUser = null; // چون اکانت پاک شد
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Failed to delete account.");
+                        }
+                    }
+                    else if (accChoice == "3")
+                    {
+                        // برگرد به منوی اصلی
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Invalid option.");
+                    }
+                }
+                else if (choice == "3") // Logout
                 {
                     Console.WriteLine($"{currentUser.Username} logged out.");
                     currentUser = null;
                 }
-                else if (choice == "4") // حذف اکانت
-                {
-                    if (currentUser != null)
-                    {
-                        if (auth.DeleteAccount(currentUser.Username))
-                        {
-                            Console.WriteLine("Your account has been deleted successfully.");
-                            currentUser = null; // چون اکانتش حذف شده
-                        }
-                        else
-                        {
-                            Console.WriteLine("Failed to delete account.");
-                        }
-                    }
-                }
-
-                else if (choice == "5") // Exit
+                else if (choice == "4") // Exit
                 {
                     break;
                 }

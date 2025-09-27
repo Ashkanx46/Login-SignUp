@@ -12,20 +12,6 @@ namespace login.Repositories
     {
         private readonly AppDbContext _context;
 
-
-        public bool DeleteUser(string username)
-        {
-            var user = GetUser(username);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-                return true;
-            }
-            return false;
-        }
-
-
         public UserRepository(AppDbContext context)
         {
             _context = context;
@@ -35,7 +21,6 @@ namespace login.Repositories
         {
             return _context.Users.FirstOrDefault(u => u.Username == username);
         }
-
 
         public void AddUser(User user)
         {
@@ -54,6 +39,18 @@ namespace login.Repositories
             if (user != null)
             {
                 user.Password = newPassword;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public bool DeleteUser(string username) // ✅ حذف کاربر
+        {
+            var user = GetUser(username);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
                 _context.SaveChanges();
                 return true;
             }

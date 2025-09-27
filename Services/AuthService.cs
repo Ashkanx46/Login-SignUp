@@ -10,38 +10,42 @@ namespace login.Services
 {
     public class AuthService
     {
-        private readonly IUserRepository _repository;
+        private readonly IUserRepository _userRepository;
 
-        public AuthService(IUserRepository repository)
+        public AuthService(IUserRepository userRepository)
         {
-            _repository = repository;
-        }
-
-        public bool DeleteAccount(string username)
-        {
-            return _repository.DeleteUser(username);
-        }
-
-
-        public bool ChangePassword(string username, string newPassword)
-        {
-            return _repository.UpdatePassword(username, newPassword);
+            _userRepository = userRepository;
         }
 
         public bool Signup(string username, string password)
         {
-            if (_repository.GetUser(username) != null)
-                return false;
+            var existingUser = _userRepository.GetUser(username);
+            if (existingUser != null) return false;
 
-            var user = new User { Username = username, Password = password };
-            _repository.AddUser(user);
+            var user = new User
+            {
+                Username = username,
+                Password = password
+            };
+
+            _userRepository.AddUser(user);
             return true;
         }
 
         public bool Login(string username, string password)
         {
-            var user = _repository.GetUser(username);
+            var user = _userRepository.GetUser(username);
             return user != null && user.Password == password;
+        }
+
+        public bool ChangePassword(string username, string newPassword)
+        {
+            return _userRepository.UpdatePassword(username, newPassword);
+        }
+
+        public bool DeleteAccount(string username)  // ✅ متد حذف اکانت
+        {
+            return _userRepository.DeleteUser(username);
         }
     }
 }

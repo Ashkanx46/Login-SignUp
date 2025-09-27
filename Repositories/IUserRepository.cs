@@ -12,10 +12,10 @@ namespace login.Repositories
     public interface IUserRepository
     {
 
+        User? GetUser(string username);
+        void AddUser(User user);
+        List<User> GetAllUsers();
+        bool UpdatePassword(string username, string newPassword);
         bool DeleteUser(string username);
-        bool UpdatePassword(string username, string newPassword); // 👈 اینو اضافه کن
-        void AddUser(User user);          // اضافه کردن کاربر جدید
-        User? GetUser(string username);   // گرفتن کاربر بر اساس یوزرنیم
-        List<User> GetAllUsers();         // برگردوندن همه کاربرها
     }
 }
