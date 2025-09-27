@@ -4,26 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using login.Models;
+using login.Data;
 
 namespace login.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly List<User> _users = new List<User>();
+        private readonly AppDbContext _context;
 
-        public User GetUser(string username)
+        public UserRepository(AppDbContext context)
         {
-            return _users.FirstOrDefault(u => u.Username == username);
+            _context = context;
         }
+
+        public User? GetUser(string username)
+        {
+            return _context.Users.FirstOrDefault(u => u.Username == username);
+        }
+
 
         public void AddUser(User user)
         {
-            _users.Add(user);
+            _context.Users.Add(user);
+            _context.SaveChanges();
         }
 
         public List<User> GetAllUsers()
         {
-            return _users;
+            return _context.Users.ToList();
         }
 
         public bool UpdatePassword(string username, string newPassword)
@@ -32,6 +40,7 @@ namespace login.Repositories
             if (user != null)
             {
                 user.Password = newPassword;
+                _context.SaveChanges();
                 return true;
             }
             return false;

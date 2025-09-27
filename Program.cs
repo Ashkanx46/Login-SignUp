@@ -1,12 +1,33 @@
 ﻿using login.Models;
 using login.Repositories;
 using login.Services;
+using login.Data;
+using Microsoft.EntityFrameworkCore;
+
+
+
+
 
 class Program
 {
+
+
+    
     static void Main()
     {
-        var repo = new UserRepository();
+
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+        .UseSqlite("Data Source=users.db")
+        .Options;
+
+        var db = new AppDbContext(options);
+        db.Database.EnsureCreated(); // اگه دیتابیس وجود نداشت، بسازش
+
+
+
+        var repo = new UserRepository(db);
+        
+
         var auth = new AuthService(repo);
 
         User currentUser = null;
@@ -61,7 +82,7 @@ class Program
                     Console.Write("Enter new password: ");
                     string password = Console.ReadLine();
 
-                    if (auth.Signup(username, password))
+                    if (auth.Signup(username!, password!))
                     {
                         currentUser = repo.GetUser(username); // auto-login
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -76,10 +97,20 @@ class Program
                 else if (choice == "2") // Login
                 {
                     Console.Write("Enter username: ");
-                    string username = Console.ReadLine();
+                    string? username = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        Console.WriteLine("Username cannot be empty!");
+                        continue;
+                    }
 
                     Console.Write("Enter password: ");
-                    string password = Console.ReadLine();
+                    string? password = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        Console.WriteLine("Password cannot be empty!");
+                        continue;
+                    }
 
                     if (auth.Login(username, password))
                     {
@@ -123,10 +154,16 @@ class Program
                 }
                 else if (choice == "2") // Change Password
                         {
-                            Console.Write("Enter new password: ");
-                            string newPassword = Console.ReadLine();
+                           Console.Write("Enter new password: ");
+string? newPassword = Console.ReadLine();
 
-                            if (auth.ChangePassword(currentUser.Username, newPassword))
+if (string.IsNullOrWhiteSpace(newPassword))
+{
+    Console.WriteLine("Password cannot be empty!");
+    continue;
+}
+
+                            if (auth.ChangePassword(currentUser.Username, newPassword!))
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 Console.WriteLine("Password changed successfully.");
