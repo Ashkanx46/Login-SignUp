@@ -12,6 +12,20 @@ namespace login.Repositories
     {
         private readonly AppDbContext _context;
 
+
+        public bool DeleteUser(string username)
+        {
+            var user = GetUser(username);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+
         public UserRepository(AppDbContext context)
         {
             _context = context;

@@ -17,6 +17,12 @@ namespace login.Services
             _repository = repository;
         }
 
+        public bool DeleteAccount(string username)
+        {
+            return _repository.DeleteUser(username);
+        }
+
+
         public bool ChangePassword(string username, string newPassword)
         {
             return _repository.UpdatePassword(username, newPassword);

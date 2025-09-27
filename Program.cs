@@ -63,7 +63,9 @@ class Program
                 Console.WriteLine("1. Show Users");
                 Console.WriteLine("2. Change Password");
                 Console.WriteLine("3. Logout");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. Delete Account"); // 👈 اضافه شد
+                Console.WriteLine("5. Exit");
+
             }
 
             Console.WriteLine("=================================");
@@ -180,7 +182,23 @@ if (string.IsNullOrWhiteSpace(newPassword))
                     Console.WriteLine($"{currentUser.Username} logged out.");
                     currentUser = null;
                 }
-                else if (choice == "4") // Exit
+                else if (choice == "4") // حذف اکانت
+                {
+                    if (currentUser != null)
+                    {
+                        if (auth.DeleteAccount(currentUser.Username))
+                        {
+                            Console.WriteLine("Your account has been deleted successfully.");
+                            currentUser = null; // چون اکانتش حذف شده
+                        }
+                        else
+                        {
+                            Console.WriteLine("Failed to delete account.");
+                        }
+                    }
+                }
+
+                else if (choice == "5") // Exit
                 {
                     break;
                 }
